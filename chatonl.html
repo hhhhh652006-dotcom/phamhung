@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+    
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Online</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+    
+            body{
+    margin:0;
+    font-family: "Segoe UI", Arial;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+}
+
+.chat-box{
+    width:420px;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.25);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.chat-box h3{
+    background:#667eea;
+    color:white;
+    margin:0;
+    padding:15px;
+    text-align:center;
+    font-weight:500;
+}
+
+#messages{
+    height:350px;
+    padding:10px;
+    overflow-y:auto;
+    background:#f7f7f7;
+}
+
+.message{
+    margin:8px 0;
+    display:flex;
+}
+
+.message span{
+    padding:8px 12px;
+    border-radius:12px;
+    max-width:70%;
+    font-size:14px;
+}
+
+.user{
+    justify-content:flex-end;
+}
+
+.user span{
+    background:#667eea;
+    color:white;
+}
+
+.other{
+    justify-content:flex-start;
+}
+
+.other span{
+    background:#e4e6eb;
+}
+
+.input-area{
+    display:flex;
+    border-top:1px solid #ddd;
+}
+
+input{
+    flex:1;
+    border:none;
+    padding:12px;
+    font-size:14px;
+    outline:none;
+}
+
+button{
+    width:80px;
+    border:none;
+    background:#667eea;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#5563d6;
+}
+    </style>
+</head>
+<body>
+
+<div class="chat-box">
+    <h3>💬 Chat Online</h3>
+
+    <div id="messages"></div>
+
+    <div class="input-area">
+        <input id="msg" placeholder="Nhập tin nhắn..." />
+        <button onclick="sendMessage()">Gửi</button>
+    </div>
+
+</div>
+
+<script>
+    // 🔴 DÁN firebaseConfig CỦA BẠN VÀO ĐÂY
+    const firebaseConfig = {
+        apiKey: "AIzaSyACu0KJ6k_3osDWZUCm4UD5J5NLtwF79tg",
+    authDomain: "chatonline-75384.firebaseapp.com",
+    databaseURL: "https://chatonline-75384-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "chatonline-75384",
+    storageBucket: "chatonline-75384.firebasestorage.app",
+    messagingSenderId: "340996809008",
+    appId: "1:340996809008:web:4d4d77c57100ce529de8f5",
+    measurementId: "G-TJDWG6RZM7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const username = prompt("Nhập tên của bạn");
+
+    function sendMessage() {
+        const message = document.getElementById("msg").value;
+        database.ref("messages").push({
+            user: username,
+            text: message
+        });
+        document.getElementById("msg").value = "";
+    }
+
+    database.ref("messages").on("child_added", function(snapshot) {
+        const data = snapshot.val();
+        const msgDiv = document.getElementById("messages");
+        let type = data.user === username ? "user" : "other";
+
+msgDiv.innerHTML += `
+<div class="message ${type}">
+<span><b>${data.user}</b><br>${data.text}</span>
+</div>
+`;
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+    });
+</script>
+
+</body>
+</html>
